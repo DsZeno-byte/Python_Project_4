@@ -1,7 +1,7 @@
 # Python_Project_4
 
 # Basic Data Analysis Tools
-
+![alt text](image.png)
 ## **Description of the Project**
 
 This project demonstrates a basic analysis of IoT sales data. It includes:

@@ -1,40 +1,56 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
 
-# Load the CSV file
-file_path = 'businessCSV.xlsx'  # Replace with the path to your CSV file
-data = pd.read_csv(file_path)
+# Step 1: Load the CSV file
+file_path = "Python_Project_4\large_sales_data.csv"  # Ensure the file name matches your actual file
+data = pd.read_csv(file_path, delimiter=";", usecols=["Month", "Sales"])
 
-# Display basic information about the dataset
-print("Dataset Info:")
-print(data.info())
+# Step 2: Data Preparation
+# Convert sales to numeric (in case of bad data like strings)
+data["Sales"] = pd.to_numeric(data["Sales"], errors="coerce")
+data = data.dropna()  # Remove rows with NaN values
 
-# Select a numeric column for analysis
-column_name = 'your_column_name'  # Replace with your numeric column name
-if column_name not in data.columns:
-    print(f"Column '{column_name}' not found in dataset.")
+# Step 3: Perform Basic Data Analysis
+mean_sales = np.mean(data["Sales"])  # Using numpy for mean
+median_sales = np.median(data["Sales"])  # Using numpy for median
+
+# Using scipy's mode function
+mode_result = stats.mode(data["Sales"], keepdims=True)
+
+# Check if the mode result contains any values and extract the mode
+if mode_result.count[0] > 0:
+    mode_sales = mode_result.mode[0]
 else:
-    # Calculate mean, median, and mode
-    column_data = data[column_name].dropna()
-    mean_value = np.mean(column_data)
-    median_value = np.median(column_data)
-    mode_value = column_data.mode().iloc[0]  # Using `.iloc[0]` to get the first mode
+    mode_sales = None  # Handle case when there's no mode
 
-    # Print the results
-    print(f"\nAnalysis for column '{column_name}':")
-    print(f"Mean: {mean_value}")
-    print(f"Median: {median_value}")
-    print(f"Mode: {mode_value}")
+# Step 4: Visualizing the Results (Bar Plot for Mean, Median, Mode)
+analysis_results = {"Mean": mean_sales, "Median": median_sales, "Mode": mode_sales}
 
-    # Visualization
-    plt.figure(figsize=(10, 5))
-    plt.hist(column_data, bins=20, color='skyblue', edgecolor='black', alpha=0.7)
-    plt.axvline(mean_value, color='red', linestyle='dashed', linewidth=1.5, label=f'Mean: {mean_value:.2f}')
-    plt.axvline(median_value, color='green', linestyle='dashed', linewidth=1.5, label=f'Median: {median_value:.2f}')
-    plt.axvline(mode_value, color='blue', linestyle='dashed', linewidth=1.5, label=f'Mode: {mode_value:.2f}')
-    plt.title(f'Distribution of {column_name}')
-    plt.xlabel(column_name)
-    plt.ylabel('Frequency')
-    plt.legend()
-    plt.show()
+# Plotting the bar chart
+plt.figure(figsize=(8, 6))
+plt.bar(
+    analysis_results.keys(),
+    analysis_results.values(),
+    color=["red", "green", "blue"],
+)
+
+# Customizing the plot
+plt.title("Basic Data Analysis of IoT Sales", fontsize=16)
+plt.ylabel("Sales Value", fontsize=12)
+plt.xlabel("Statistical Measure", fontsize=12)
+plt.grid(True, linestyle="--", alpha=0.6)
+
+# Display the plot
+plt.tight_layout()
+plt.show()
+
+# Step 5: Print Basic Data Analysis Results
+print("Basic Data Analysis Results:")
+print(f"Mean Sales: {mean_sales:.2f}")
+print(f"Median Sales: {median_sales:.2f}")
+if mode_sales is not None:
+    print(f"Mode Sales: {mode_sales:.2f}")
+else:
+    print("Mode Sales: No single mode found")
